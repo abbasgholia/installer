@@ -2,9 +2,10 @@
 
 namespace Froiden\LaravelInstaller\Middleware;
 
+use App\Models\User;
 use Closure;
 use DB;
-
+use Illuminate\Support\Facades\Schema;
 /**
  * Class canInstall
  * @package Froiden\LaravelInstaller\Middleware
@@ -23,7 +24,7 @@ class canInstall
     {
 
         if($this->alreadyInstalled()) {
-            abort(404);
+            abort(403, 'این سامانه قبلا نصب شده!  لطفا پس از حذف فایل installed  در مسیر storage\framework\sessions  مجددا رفرش کنید. یا به دیتابیس وصل هستید.');
         }
 
         $this->changePhpConfigs();
@@ -38,7 +39,26 @@ class canInstall
      */
     public function alreadyInstalled()
     {
-        return file_exists(storage_path('installed'));
+        $database_connected =false;
+
+//        try {
+//            // بررسی اتصال به پایگاه داده با تلاش برای دسترسی به ساختار جداول
+//            $database_connected = Schema::hasTable('users');
+//            User::count() == 0 ? $database_connected = false : '';
+//        } catch (\Exception $e) {
+//            // در صورت خطا، کاربر را به صفحه نصب هدایت کنید
+//            $database_connected = false;
+//        }
+
+//        dd(file_exists(storage_path('installed')) , $ggg);
+//        if ($database_connected == true || file_exists(storage_path('installed') ) == true){
+        if ( file_exists(storage_path('installed') ) == true){
+            return true;
+        }else{
+            return false;
+        }
+
+
     }
 
     private function changePhpConfigs()
