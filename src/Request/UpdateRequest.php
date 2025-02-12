@@ -24,10 +24,18 @@ class UpdateRequest extends CoreRequest
      */
     public function rules()
     {
+
+//        dd(request()->all() , request("serializable") ?? 0);
         return [
             'hostname' => 'required',
             'username' => 'required',
             'database' => 'required',
+            'name_co' => 'required|string',
+            'year' => 'required|integer|digits:4|min:1400|max:2000',
+            'invable' => 'required|in:0,1',
+            'serializable' => 'required|in:0,1',
+            'batchable' => 'required|in:0,1',
+
         ];
     }
 
