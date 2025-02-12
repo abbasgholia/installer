@@ -63,28 +63,41 @@ class EnvironmentManager
         $dbPassword = $input->get('password');
 
         $databaseSetting = 'DB_HOST=' . $dbHost . '
-DB_DATABASE=' . $dbName . '
-DB_USERNAME=' . $dbUsername . '
-DB_PASSWORD="' . $dbPassword . '"
-APP_URL="' . request()->getSchemeAndHttpHost() . '"
-';
-
+        DB_DATABASE=' . $dbName . '
+        DB_USERNAME=' . $dbUsername . '
+        DB_PASSWORD="' . $dbPassword . '"
+        APP_URL="' . request()->getSchemeAndHttpHost() . '"
+        ';
         // @ignoreCodingStandard
         $rows       = explode("\n", $env);
+
         $unwanted   = "DB_HOST|DB_DATABASE|DB_USERNAME|DB_PASSWORD|APP_URL";
         $cleanArray = preg_grep("/$unwanted/i", $rows, PREG_GREP_INVERT);
+
 
         $cleanString = implode("\n", $cleanArray);
 
 
         $env = $cleanString.$databaseSetting;
+
+
+
         try {
+
             $dbh = new \PDO('mysql:host='.$dbHost, $dbUsername, $dbPassword);
+
+
+
 
             $dbh->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
             // First check if database exists
+
             $stmt = $dbh->query('CREATE DATABASE IF NOT EXISTS `'.$dbName.'` CHARACTER SET utf8 COLLATE utf8_general_ci;');
+//            $stmt = $dbh->query('CREATE DATABASE `'.$dbName.'` CHARACTER SET utf8 COLLATE utf8_general_ci;');
+
+
+
             // Save settings in session
             $_SESSION['db_username'] = $dbUsername;
             $_SESSION['db_password'] = $dbPassword;
@@ -103,12 +116,18 @@ APP_URL="' . request()->getSchemeAndHttpHost() . '"
 
 
         } catch (\PDOException $e) {
-            return Reply::error('DB Error: ' . $e->getMessage());
+            //dd($e->errorInfo[1], $e->getCode());
+            if ($e->errorInfo[1] == 1007) {
+                return Reply::error('خطای دیتابیس :   دیتابیس  ' . $dbName .' وجود دارد لطفا دیتابیس دیگری انتخاب کنید.' );
+            }else{
+                return Reply::error('خطای دیتابیس :   ' . $e->getMessage());
+            }
+
 
 
         } catch (\Exception $e) {
 
-            return Reply::error('DB Error: ' . $e->getMessage());
+            return Reply::error('خطای دیتابیس :  ' . $e->getMessage());
 
         }
     }
