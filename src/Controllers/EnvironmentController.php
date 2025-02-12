@@ -45,7 +45,16 @@ class EnvironmentController extends Controller
     public function save(UpdateRequest $request)
     {
 
+        session(["year"=> $request->year]);
+        session(["invable"=> $request->invable ?? 0]);
+        session(["serializable"=> $request->serializable ?? 0]);
+        session(["batchable"=> $request->batchable ?? 0]);
+        session(["name_co"=> $request->name_co]);
+        session()->save();
         $message = $this->environmentManager->saveFile($request);
+
+        $message['message'] = "پیام سیستم :  <br>" . $message['message'];
+
         return $message;
 
     }
